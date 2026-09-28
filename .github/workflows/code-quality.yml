@@ -4,7 +4,7 @@ on:
     workflow_call: 
 
 jobs:
-    sast:
+    lint:
         runs-on: ubuntu-latest
         steps:
             - name: Code Checkout
@@ -18,7 +18,7 @@ jobs:
                 cache-dependency-path: frontend/package-lock.json
             
             - name: Install npm Packages
-              run: npm install --legacy-peer-deps
+              run: npm ci  --legacy-peer-deps
               working-directory: frontend
 
             - name: Run Linter
@@ -33,9 +33,9 @@ jobs:
                 cache-dependency-path: backend/go.sum
             
             - name: Run Go Formatter
-              run: go fmt
+              run: test -z "$(gofmt -l .)"
               working-directory: backend
 
             - name: Run Go Vet
-              run: go vet
+              run: go vet ./...
               working-directory: backend
