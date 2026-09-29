@@ -1,0 +1,12 @@
+name: DevSecOps
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    code-quality:
+        uses: ./.github/workflows/code-quality.yml
+
+    code-testing:
+        uses: ./.github/workflows/code-testing.yml
