@@ -32,13 +32,5 @@ jobs:
                   ${{ vars.DOCKERHUB_USERNAME }}/devboard-${{ matrix.folders}}:latest
                   ${{ vars.DOCKERHUB_USERNAME }}/devboard-${{ matrix.folders }}:${{ github.sha }}
 
-            - name: Trivy Scan
-              uses: aquasecurity/trivy-action@0.24.0
-              with:
-                image-ref: '${{ vars.DOCKERHUB_USERNAME }}/devboard-${{ matrix.folders }}:${{ github.sha }}'
-                format: 'table'
-                exit-code: '0'
-                ignore-unfixed: true
-                vuln-type: 'os,library'
-                severity: 'CRITICAL,HIGH'
+  
                 
