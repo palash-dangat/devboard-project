@@ -11,5 +11,8 @@ jobs:
     secret-scanning:
         uses: ./.github/workflows/secrets-scan.yml
 
+    dependency-scan:
+        uses: ./.github/workflows/dependency-scan.yml
+
     code-testing:
         uses: ./.github/workflows/code-testing.yml

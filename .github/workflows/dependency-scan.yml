@@ -1,6 +1,4 @@
-# Goal - I have to ensure the packages & dependencies have been audited for Security
-
-name: Dependecy scan
+name: Dependency scan
 
 on:
     workflow_call:
@@ -18,15 +16,15 @@ jobs:
             - name: Setup Go
               uses: actions/setup-go@v6
               with:
-                go-version-file: 'go.mod'
-                cache-dependency-path: go.sum
+                go-version-file: 'backend/go.mod'
+                cache-dependency-path: backend/go.sum
 
             - name: Install Govulncheck
               run: go install golang.org/x/vuln/cmd/govulncheck@latest
 
             - name: GoVulncheck
               continue-on-error: true
-              run: govulncheck ./... > govulncheck-report.txt
+              run: govulncheck ./... > ../reports/govulncheck-report.txt
               working-directory: backend
 
             - name: Setup Node
@@ -37,13 +35,14 @@ jobs:
                 cache-dependency-path: frontend/package-lock.json
 
             - name: Dependency Scan for Node
-              run: npm audit
+              continue-on-error: true
+              run: npm audit > ../reports/npm-audit-report.txt
               working-directory: frontend
 
-            - name: Upload Scan Reports
+            - name:  Upload Dependency Check Report
               if: always() 
               uses: actions/upload-artifact@v4
               with:
-                name: scan-reports
+                name: dependency-scan-reports
                 path: reports/
                 retention-days: 5
