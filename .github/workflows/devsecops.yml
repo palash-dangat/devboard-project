@@ -29,3 +29,6 @@ jobs:
         uses: ./.github/workflows/docker.yml
         needs: [code-quality,secret-scanning,dependency-scan,code-testing,docker-scans]
         secrets: inherit
+
+    deployment:
+        uses: ./.github/workflows/deployment.yml
