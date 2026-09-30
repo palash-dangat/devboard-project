@@ -38,3 +38,8 @@ jobs:
         needs: [docker-build-and-push]
         uses: ./.github/workflows/deployment.yml
         secrets: inherit
+
+    dast-scan:
+        needs: [deployment]
+        uses: ./.github/workflows/dast-scan.yml
+        secrets: inherit
