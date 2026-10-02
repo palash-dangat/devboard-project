@@ -2,7 +2,7 @@ name: DevSecOps
 
 on:
     push:
-        branches: [main]
+        branches: [gitops-argo]
 
 jobs:
     code-quality:
@@ -34,12 +34,12 @@ jobs:
         needs: [code-quality,secret-scanning,dependency-scan,code-testing,docker-scans,sonarqube-scan]
         secrets: inherit
 
-    deployment:
-        needs: [docker-build-and-push]
-        uses: ./.github/workflows/deployment.yml
-        secrets: inherit
+    # deployment:
+    #     needs: [docker-build-and-push]
+    #     uses: ./.github/workflows/deployment.yml
+    #     secrets: inherit
 
-    dast-scan:
-        needs: [deployment]
-        uses: ./.github/workflows/dast-scan.yml
-        secrets: inherit
+    # dast-scan:
+    #     needs: [deployment]
+    #     uses: ./.github/workflows/dast-scan.yml
+    #     secrets: inherit
