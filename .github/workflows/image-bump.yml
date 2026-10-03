@@ -1,0 +1,49 @@
+name: GitOps Image Bump
+ 
+on:
+  workflow_call:
+    inputs:
+      image_tag:
+        required: true
+        type: string
+ 
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout gitops-argo
+        uses: actions/checkout@v7
+        with:
+          ref: gitops-argo
+ 
+      - name: Write image tags into manifests
+        env:
+          OWNER: ${{ vars.DOCKERHUB_USERNAME }}
+          TAG: ${{ inputs.image_tag }}
+        run: |
+          set -eu
+          for svc in backend frontend; do
+            f="kubernetes/${svc}-deployment.yml"
+            [ -f "$f" ] || { echo "Missing $f"; exit 1; }
+            sed -i "s|image: .*devboard-${svc}:.*|image: ${OWNER}/devboard-${svc}:${TAG}|" "$f"
+            grep -q "devboard-${svc}:${TAG}" "$f" || { echo "Tag not written in $f"; exit 1; }
+          done
+ 
+      - name: Commit and push
+        env:
+          TAG: ${{ inputs.image_tag }}
+        run: |
+          set -eu
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "Manifests already at ${TAG}; nothing to commit."
+            exit 0
+          fi
+          git add -A
+          git commit -m "ci: deploy ${TAG} [skip ci]"
+          git push origin HEAD:gitops-argo
+ 
+
