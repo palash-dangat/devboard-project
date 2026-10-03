@@ -62,7 +62,7 @@ flowchart LR
 | CI | GitHub Actions (reusable workflows) |
 | Security | Gitleaks, Hadolint, Trivy, govulncheck, npm audit, SonarQube |
 | Registry | Docker Hub |
-| Monitoring | Grafana |
+| Monitoring | Prometheus and Grafana (kube-prometheus-stack, installed with Helm) |
 
 ---
 
@@ -77,7 +77,7 @@ The pipeline is defined in [`.github/workflows/devsecops.yml`](.github/workflows
 | Dependency scan | `dependency-scan.yml` | `govulncheck` and `npm audit`; reports uploaded as an artifact |
 | Tests | `code-testing.yml` | Frontend unit tests and `go test` |
 | Docker scans | `docker-scans.yml` | Hadolint on each Dockerfile, then Trivy on the built image (CRITICAL severity) |
-| SAST | `sonarqube-scan.yml` | SonarQube static analysis |
+| SAST | `sonarqube-scan.yml` | SonarQube Cloud static analysis |
 | Build and push | `docker.yml` | Builds both images, pushes `:latest` and `:<commit-sha>` to Docker Hub |
 | GitOps bump | `image-bump.yml` | Writes the new SHA tag into the Deployments and commits it back |
 
@@ -105,7 +105,7 @@ All manifests are in [`kubernetes/`](kubernetes), deployed to the `devboard` nam
 | `postgres-statefulset`, `postgres-service` | PostgreSQL with a 1Gi EBS-backed volume (gp2) and a headless service |
 | `postgres-init` | ConfigMap that loads the schema and seed data on first start |
 | `config-map`, `secrets` | Database settings injected as environment variables |
-| `frontend-hpa` | Horizontal Pod Autoscaler for the frontend (1 to 5 replicas on CPU) |
+| `frontend-hpa` | Horizontal Pod Autoscaler for the frontend (1 to 5 replicas on CPU) | HPA threshold (10%) is set low for demo |
 | `gateway`, `httproute` | Gateway API resources that expose the app through an AWS load balancer |
 | `sa-operator`, `role-operator`, `rolebinding-operator` | Namespace-scoped RBAC for an operator service account |
 
@@ -174,6 +174,7 @@ docker compose down -v   # stop and wipe the database
 
 ## Deploy to AWS EKS
 
+Tested on KIND first
 **Prerequisites:** an AWS account with credentials configured, plus `aws`, `eksctl`, `kubectl` and `helm` installed.
 
 **1. Create the cluster**
@@ -238,7 +239,7 @@ Under **Settings > Secrets and variables > Actions**:
 
 ## Monitoring
 
-Grafana dashboards show pod and network health across the cluster, including the Argo CD components (see the screenshot above).
+Prometheus & Grafana dashboards show pod and network health across the cluster, including the Argo CD components (see the screenshot above).
 
 ---
 
@@ -258,12 +259,16 @@ eksctl delete cluster -f eks-config/eks-cluster.yml
 - **Secrets management:** the Kubernetes `Secret` here holds demo credentials in base64, which is not encryption. For real use, move to Sealed Secrets or External Secrets with AWS Secrets Manager.
 - **Enforce security gates:** make Trivy and the dependency scans fail the build on CRITICAL findings.
 - **HTTPS:** add a TLS listener to the Gateway with a certificate.
-- **Alerting:** add Prometheus alert rules on top of the Grafana dashboards.
+- **Alerting:** Configure Alertmanager receivers (Slack/email) on top of the default rules.
 - **Smaller attack surface:** replace `vite preview` in the frontend image with a static server such as nginx.
 
 ---
 
+## Acknowledgements
+
+  Built while learning from [TrainWithShubham](https://trainwithshubham.com)'s DevOps content.
+
 ## Author
 
 **Palash Dangat** · DevOps & Cloud Engineer (fresher)
-[LinkedIn](https://www.linkedin.com/in/YOUR-PROFILE) · [GitHub](https://github.com/palash-dangat)
+[LinkedIn]([https://www.linkedin.com/in/YOUR-PROFILE](https://www.linkedin.com/in/palash-dangat-46b79b298)) · [GitHub](https://github.com/palash-dangat)
