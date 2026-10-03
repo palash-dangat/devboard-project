@@ -21,6 +21,7 @@ export default defineConfig({
     },
   },
   preview: {
+    allowedHosts: true,
     proxy: {
       '/api': {
         // `backend` is the compose service name; 8080 is its container port and
