@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: devboard-app
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/palash-dangat/devboard-project.git
+    targetRevision: gitops-argo
+    path: kubernetes
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: devboard
+
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+
+  syncPolicy:
+    automated:
+      prune: true      
+      selfHeal: true   
+    syncOptions:
+      - CreateNamespace=true
