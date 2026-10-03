@@ -3,6 +3,9 @@ name: DevSecOps
 on:
     push:
         branches: [gitops-argo]
+        paths-ignore:
+            - 'kubernetes/**'
+    workflow_dispatch:
 
 jobs:
     code-quality:
@@ -34,12 +37,11 @@ jobs:
         needs: [code-quality,secret-scanning,dependency-scan,code-testing,docker-scans,sonarqube-scan]
         secrets: inherit
 
-    # deployment:
-    #     needs: [docker-build-and-push]
-    #     uses: ./.github/workflows/deployment.yml
-    #     secrets: inherit
-
-    # dast-scan:
-    #     needs: [deployment]
-    #     uses: ./.github/workflows/dast-scan.yml
-    #     secrets: inherit
+    gitops-bump:
+        needs: [docker-build-and-push]
+        permissions:
+            contents: write
+        uses: ./.github/workflows/image-bump.yml
+        with:
+            image_tag: ${{ github.sha }}
+        secrets: inherit
