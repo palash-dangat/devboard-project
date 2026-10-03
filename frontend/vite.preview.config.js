@@ -2,6 +2,7 @@
 // image. It forwards /api to the backend — the same job nginx would do.
 export default {
   preview: {
+    allowedHosts: true,
     proxy: {
       '/api': {
         target: 'http://backend:8080',
