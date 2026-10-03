@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: devboard-backend
-        image: palashhh18/devboard-backend:24ef4fa6e42f0aa3287d8e3394ded38f3a152039
+        image: palashhh18/devboard-backend:28417e9483b414bddc164c0fb3fbd6005de8a5e5
         ports:
           - containerPort: 8080
         env:
